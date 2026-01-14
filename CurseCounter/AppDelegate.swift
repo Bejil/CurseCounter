@@ -23,6 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 		
 		window?.makeKeyAndVisible()
 		
+		CC_Audio.shared.playMusic()
+		
 		return true
 	}
 }

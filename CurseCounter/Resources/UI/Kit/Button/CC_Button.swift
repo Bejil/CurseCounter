@@ -178,7 +178,7 @@ public class CC_Button : UIButton {
 		// Action du bouton
 		addAction(.init(handler: { [weak self] _ in
 			CC_Feedback.shared.make(.On)
-			CC_Audio.shared.play(.Button)
+			CC_Audio.shared.playSound(.Button)
 			self?.action?(self)
 		}), for: .touchUpInside)
 		

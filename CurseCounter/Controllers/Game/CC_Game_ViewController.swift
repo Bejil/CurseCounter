@@ -139,7 +139,7 @@ public class CC_Game_ViewController : CC_ViewController {
 				// Incrémenter le compteur de succès
 				self?.successCount += 1
 				
-				CC_Audio.shared.play(.Success)
+				CC_Audio.shared.playSound(.Success)
 				CC_Feedback.shared.make(.Success)
 				
 				targetCircle.pulse(Colors.Secondary) {
@@ -154,7 +154,7 @@ public class CC_Game_ViewController : CC_ViewController {
 			}
 			else {
 				
-				CC_Audio.shared.play(.Error)
+				CC_Audio.shared.playSound(.Error)
 				CC_Feedback.shared.make(.Error)
 				
 				UIView.animation {
@@ -221,7 +221,7 @@ public class CC_Game_ViewController : CC_ViewController {
 	
 	private func gameOver() {
 		
-		CC_Audio.shared.play(.Error)
+		CC_Audio.shared.playSound(.Error)
 		CC_Feedback.shared.make(.Error)
 		
 		let alertViewController:CC_Alert_ViewController = .init()

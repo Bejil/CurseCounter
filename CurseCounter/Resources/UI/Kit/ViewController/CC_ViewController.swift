@@ -19,7 +19,7 @@ public class CC_ViewController: UIViewController {
 				navigationItem.leftBarButtonItem = .init(image: UIImage(systemName: "xmark"), primaryAction: .init(handler: { [weak self] _ in
 					
 					CC_Feedback.shared.make(.Off)
-					CC_Audio.shared.play(.Button)
+					CC_Audio.shared.playSound(.Button)
 					
 					self?.close()
 				}))
