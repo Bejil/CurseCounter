@@ -1,0 +1,33 @@
+//
+//  Localizables.strings
+//  LettroLine
+//
+//  Created by BLIN Michael on 12/02/2025.
+//
+
+//MARK: - Alert
+"alert.cancel.button" = "Annuler";
+"alert.dismiss.button" = "Ok";
+"alert.error.title" = "Attention";
+"alert.error.button" = "Réessayer";
+"alert.loading.title" = "Chargement en cours...";
+"alert.loading.content" = "Merci de patienter pendant le chargement";
+
+//MARK: - Menu
+"menu.title.0" = "Curse";
+"menu.title.1" = "Counter";
+"menu.subtitle" = "Arriverez-vous à garder le rythme ?";
+"menu.button.newGame" = "Nouvelle partie";
+
+//MARK: - Game
+"game.over.title" = "Perdu !";
+"game.over.message" = "Vous avez réussi %d zones.";
+
+//MARK: - Settings
+"settings.button" = "Réglages";
+"settings.sounds" = "Sons";
+"settings.sounds.on" = "Activés";
+"settings.sounds.off" = "Désactivés";
+"settings.vibrations" = "Vibrations";
+"settings.vibrations.on" = "Activées";
+"settings.vibrations.off" = "Désactivées";
