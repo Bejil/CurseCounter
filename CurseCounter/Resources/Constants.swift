@@ -82,6 +82,14 @@ public struct Colors {
 			public static let Content:UIColor = UIColor(named: "ButtonTextContent")!
 		}
 	}
+	
+	public struct Hits {
+		
+		public static let Wrong:UIColor = UIColor(named: "HitsWrong")!
+		public static let Perfect:UIColor = UIColor(named: "HitsPerfect")!
+		public static let Great:UIColor = UIColor(named: "HitsGreat")!
+		public static let Good:UIColor = UIColor(named: "HitsGood")!
+	}
 }
 
 public struct Fonts {

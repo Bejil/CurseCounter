@@ -17,12 +17,15 @@
 "menu.title.0" = "Curse";
 "menu.title.1" = "Counter";
 "menu.subtitle" = "Arriverez-vous à garder le rythme ?";
-"menu.button.newGame" = "Nouvelle partie";
+"menu.button.newGame.title" = "Nouvelle partie";
+"menu.button.newGame.subtitle" = "Meilleur score:";
 
 //MARK: - Game
-"game.over.alert.title" = "Perdu !";
+"game.points" = "points";
 "game.over.alert.points" = "%i points";
 "game.over.alert.hits" = "%i zones touchées";
+"game.over.default.alert.title" = "Perdu !";
+"game.over.bestScore.alert.title" = "Nouveau record !";
 "game.hit.3" = "+3";
 "game.hit.2" = "+2";
 "game.hit.1" = "+1";

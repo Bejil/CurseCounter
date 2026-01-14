@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D477DE522ED9AF9C00051CB9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D477DE512ED9AF9C00051CB9 /* SnapKit */; };
+		D4A6BC262F17A65700E931A9 /* SPConfetti in Frameworks */ = {isa = PBXBuildFile; productRef = D4A6BC252F17A65700E931A9 /* SPConfetti */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D477DE522ED9AF9C00051CB9 /* SnapKit in Frameworks */,
+				D4A6BC262F17A65700E931A9 /* SPConfetti in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			name = CurseCounter;
 			packageProductDependencies = (
 				D477DE512ED9AF9C00051CB9 /* SnapKit */,
+				D4A6BC252F17A65700E931A9 /* SPConfetti */,
 			);
 			productName = CurseCounter;
 			productReference = D477DCF62ED9A56200051CB9 /* CurseCounter.app */;
@@ -115,6 +118,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				D477DE502ED9AF9C00051CB9 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				D4A6BC242F17A65700E931A9 /* XCRemoteSwiftPackageReference "SPConfetti" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D477DCF72ED9A56200051CB9 /* Products */;
@@ -370,6 +374,14 @@
 				minimumVersion = 5.7.1;
 			};
 		};
+		D4A6BC242F17A65700E931A9 /* XCRemoteSwiftPackageReference "SPConfetti" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ivanvorobei/SPConfetti";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.4.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -377,6 +389,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D477DE502ED9AF9C00051CB9 /* XCRemoteSwiftPackageReference "SnapKit" */;
 			productName = SnapKit;
+		};
+		D4A6BC252F17A65700E931A9 /* SPConfetti */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A6BC242F17A65700E931A9 /* XCRemoteSwiftPackageReference "SPConfetti" */;
+			productName = SPConfetti;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

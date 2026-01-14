@@ -10,6 +10,18 @@ import SnapKit
 
 public class CC_Menu_ViewController : CC_ViewController {
 	
+	private lazy var newGameStartButton:CC_Button = {
+		
+		$0.image = UIImage(systemName: "dot.circle.and.hand.point.up.left.fill")
+		return $0
+		
+	}(CC_Button(String(key: "menu.button.newGame.title")) { _ in
+		
+		let navigationController:CC_NavigationController = .init(rootViewController: CC_Game_ViewController())
+		navigationController.navigationBar.prefersLargeTitles = false
+		UI.MainController.present(navigationController, animated: true)
+	})
+	
 	public override func loadView() {
 		
 		super.loadView()
@@ -22,12 +34,6 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 		let subtitleLabel:CC_Label = .init(String(key: "menu.subtitle"))
 		subtitleLabel.textAlignment = .center
-		
-		let newGameStartButton:CC_Button = .init(String(key: "menu.button.newGame")) { _ in
-			
-			UI.MainController.present(CC_NavigationController(rootViewController: CC_Game_ViewController()), animated: true)
-		}
-		newGameStartButton.image = UIImage(systemName: "dot.circle.and.hand.point.up.left.fill")
 		
 		let stackView:UIStackView = .init(arrangedSubviews: [titleLabel,subtitleLabel,newGameStartButton,CC_Settings_Button()])
 		stackView.axis = .vertical
@@ -49,5 +55,13 @@ public class CC_Menu_ViewController : CC_ViewController {
 		}
 		
 		stackView.animate()
+	}
+	
+	public override func viewWillAppear(_ animated: Bool) {
+		
+		super.viewWillAppear(animated)
+		
+		let bestScore:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0
+		newGameStartButton.subtitle = bestScore > 0 ? String(key: "menu.button.newGame.subtitle") + " \(bestScore)" : nil
 	}
 }

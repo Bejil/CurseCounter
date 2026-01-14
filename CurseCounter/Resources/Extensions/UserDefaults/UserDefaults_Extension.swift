@@ -14,6 +14,8 @@ extension UserDefaults {
 		case vibrationsEnabled = "vibrationsEnabled"
 		case soundsEnabled = "soundsEnabled"
 		case musicEnabled = "musicEnabled"
+		
+		case bestScore = "bestScore"
 	}
 	
 	public static func set(_ value:Any?, _ key:UserDefaults.Keys) {

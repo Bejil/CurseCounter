@@ -19,25 +19,28 @@ public class CC_Game_ViewController : CC_ViewController {
 		static func forPrecision(_ precision: Double) -> HitType {
 			
 			let precisionPercent = Int(precision * 100)
-			if let index = [0...49, 50...84, 85...100].firstIndex(where: { $0.contains(precisionPercent) }) {
+			if let index = [0...59, 60...89, 90...100].firstIndex(where: { $0.contains(precisionPercent) }) {
 				return HitType(rawValue: index + 1) ?? .good
 			}
 			return .good
 		}
 		
 		var points: Int {
+			
 			return rawValue
 		}
 		
 		var color: UIColor {
+			
 			switch self {
-			case .perfect: return Colors.Secondary
-			case .great: return Colors.Tertiary
-			case .good: return .white
+			case .perfect: return Colors.Hits.Perfect
+			case .great: return Colors.Hits.Great
+			case .good: return Colors.Hits.Good
 			}
 		}
 		
 		var text: String {
+			
 			return String(key: "game.hit.\(rawValue)")
 		}
 	}
@@ -46,18 +49,10 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		didSet {
 			
-			pointsLabel.text = "\(pointsCount)"
+			title = "\(pointsCount) " + String(key: "game.points")
 		}
 	}
 	private var hitsCount:Int = 0
-	private lazy var pointsLabel: CC_Label = {
-		
-		$0.font = Fonts.Content.Title.H1.withSize(Fonts.Content.Title.H1.pointSize+20)
-		$0.textColor = Colors.Content.Title
-		$0.textAlignment = .center
-		return $0
-		
-	}(CC_Label("\(pointsCount)"))
 	private lazy var zoneView: UIView = .init()
 	
 	public override func loadView() {
@@ -66,7 +61,9 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		isModal = true
 		
-		let stackView: UIStackView = .init(arrangedSubviews: [pointsLabel, zoneView])
+		title = "\(pointsCount) " + String(key: "game.points")
+		
+		let stackView: UIStackView = .init(arrangedSubviews: [zoneView])
 		stackView.axis = .vertical
 		stackView.spacing = UI.Margins
 		view.addSubview(stackView)
@@ -146,17 +143,52 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		var isActive = false
 		var hasBeenTapped = false
-		let timeToSuccessZone = animationDuration * (initialSize - 5.0 * targetSize) / (initialSize - targetSize)
+		var currentHitType: HitType = .good
+		// Zone cliquable quand le cercle est à 8x la taille cible (plus grand = plus tôt)
+		let activeZoneMultiplier: CGFloat = 8.0
+		let timeToSuccessZone = animationDuration * (initialSize - activeZoneMultiplier * targetSize) / (initialSize - targetSize)
+		
+		// Timer pour mettre à jour la couleur en temps réel
+		var colorTimer: Timer?
 		
 		UIApplication.wait(timeToSuccessZone) {
 			
 			isActive = true
+			currentHitType = .good
 			
 			UIView.animation {
 				
-				targetCircle.backgroundColor = Colors.Secondary.withAlphaComponent(0.3)
-				targetCircle.layer.borderColor = Colors.Secondary.cgColor
-				shrinkingCircle.layer.borderColor = Colors.Secondary.cgColor
+				targetCircle.backgroundColor = Colors.Hits.Good.withAlphaComponent(0.3)
+				targetCircle.layer.borderColor = Colors.Hits.Good.cgColor
+				shrinkingCircle.layer.borderColor = Colors.Hits.Good.cgColor
+			}
+			
+			// Démarrer le timer pour les mises à jour de couleur (~60fps)
+			colorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
+				
+				guard isActive, !hasBeenTapped else { return }
+				
+				let currentScale = shrinkingCircle.layer.presentation()?.transform.m11 ?? 1.0
+				let currentSize = initialSize * currentScale
+				
+				let activeRangeStart = activeZoneMultiplier * targetSize
+				let activeRangeEnd = targetSize
+				let precision = 1.0 - (currentSize - activeRangeEnd) / (activeRangeStart - activeRangeEnd)
+				let precisionValue = max(0, min(1, precision))
+				
+				let newHitType = HitType.forPrecision(precisionValue)
+				
+				if newHitType != currentHitType {
+					
+					currentHitType = newHitType
+					
+					UIView.animation(0.15) {
+						
+						targetCircle.backgroundColor = currentHitType.color.withAlphaComponent(0.3)
+						targetCircle.layer.borderColor = currentHitType.color.cgColor
+						shrinkingCircle.layer.borderColor = currentHitType.color.cgColor
+					}
+				}
 			}
 		}
 		
@@ -164,6 +196,10 @@ public class CC_Game_ViewController : CC_ViewController {
 			
 			guard !hasBeenTapped else { return }
 			hasBeenTapped = true
+			
+			// Arrêter le timer
+			colorTimer?.invalidate()
+			colorTimer = nil
 			
 			if isActive {
 				
@@ -175,9 +211,9 @@ public class CC_Game_ViewController : CC_ViewController {
 				let currentScale = shrinkingCircle.layer.presentation()?.transform.m11 ?? 1.0
 				let currentSize = initialSize * currentScale
 				
-				// Zone active: de 5x à 1x targetSize
-				// Précision: 0% quand à 5x, 100% quand à 1x
-				let activeRangeStart = 5.0 * targetSize
+				// Zone active: de Nx à 1x targetSize
+				// Précision: 0% quand à Nx, 100% quand à 1x
+				let activeRangeStart = activeZoneMultiplier * targetSize
 				let activeRangeEnd = targetSize
 				let precision = 1.0 - (currentSize - activeRangeEnd) / (activeRangeStart - activeRangeEnd)
 				let precisionValue = max(0, min(1, precision))
@@ -214,11 +250,11 @@ public class CC_Game_ViewController : CC_ViewController {
 				
 				UIView.animation {
 					
-					targetCircle.backgroundColor = Colors.Primary.withAlphaComponent(0.4)
-					targetCircle.layer.borderColor = Colors.Primary.cgColor
+					targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.4)
+					targetCircle.layer.borderColor = Colors.Hits.Wrong.cgColor
 				}
 				
-				targetCircle.pulse(Colors.Primary) {
+				targetCircle.pulse(Colors.Hits.Wrong) {
 					
 					qteContainer.removeFromSuperview()
 				}
@@ -234,6 +270,10 @@ public class CC_Game_ViewController : CC_ViewController {
 			guard !hasBeenTapped else { return }
 			hasBeenTapped = true
 			isActive = false
+			
+			// Arrêter le timer
+			colorTimer?.invalidate()
+			colorTimer = nil
 			
 			UIView.animation(0.3, {
 				
@@ -319,17 +359,42 @@ public class CC_Game_ViewController : CC_ViewController {
 	
 	private func gameOver() {
 		
-		CC_Audio.shared.playSound(.Error)
-		CC_Feedback.shared.make(.Error)
-		
 		let alertViewController: CC_Alert_ViewController = .init()
-		alertViewController.title = String(key: "game.over.alert.title")
+		var presentCompletion:(()->Void)?
+		
+		let bestScore:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0
+		if pointsCount > bestScore {
+			
+			UserDefaults.set(pointsCount, .bestScore)
+			
+			CC_Audio.shared.playSound(.Success)
+			CC_Feedback.shared.make(.Success)
+			
+			alertViewController.title = String(key: "game.over.bestScore.alert.title")
+			alertViewController.dismissHandler = {
+				
+				CC_Confettis.stop()
+			}
+			
+			presentCompletion = {
+				
+				CC_Confettis.start()
+			}
+		}
+		else {
+			
+			CC_Audio.shared.playSound(.Error)
+			CC_Feedback.shared.make(.Error)
+			
+			alertViewController.title = String(key: "game.over.default.alert.title")
+		}
+		
 		alertViewController.add(String(format: String(key: "game.over.alert.points"), pointsCount))
 		alertViewController.add(String(format: String(key: "game.over.alert.hits"), hitsCount))
 		alertViewController.addDismissButton { [weak self] _ in
 			
 			self?.close()
 		}
-		alertViewController.present()
+		alertViewController.present(presentCompletion)
 	}
 }
