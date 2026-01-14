@@ -20,14 +20,22 @@
 "menu.button.newGame" = "Nouvelle partie";
 
 //MARK: - Game
-"game.over.title" = "Perdu !";
-"game.over.message" = "Vous avez réussi %d zones.";
+"game.over.alert.title" = "Perdu !";
+"game.over.alert.points" = "%i points";
+"game.over.alert.hits" = "%i zones touchées";
+"game.hit.3" = "+3";
+"game.hit.2" = "+2";
+"game.hit.1" = "+1";
 
 //MARK: - Settings
 "settings.button" = "Réglages";
-"settings.sounds" = "Sons";
-"settings.sounds.on" = "Activés";
-"settings.sounds.off" = "Désactivés";
-"settings.vibrations" = "Vibrations";
-"settings.vibrations.on" = "Activées";
-"settings.vibrations.off" = "Désactivées";
+"settings.button.music" = "Musique";
+"settings.button.music.description" = "Musique de fond pendant le jeu";
+"settings.button.music.on" = "Activée";
+"settings.button.music.off" = "Désactivée";
+"settings.button.sounds" = "Sons";
+"settings.button.sounds.on" = "Activés";
+"settings.button.sounds.off" = "Désactivés";
+"settings.button.vibrations" = "Vibrations";
+"settings.button.vibrations.on" = "Activées";
+"settings.button.vibrations.off" = "Désactivées";
