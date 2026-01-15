@@ -29,6 +29,7 @@
 "game.over.default.alert.title" = "Perdu !";
 "game.over.bestScore.alert.title" = "Nouveau record !";
 "game.hit.combo" = "Combo";
+"game.hit.wrong" = "Raté";
 "game.hit.3" = "+3";
 "game.hit.2" = "+2";
 "game.hit.1" = "+1";

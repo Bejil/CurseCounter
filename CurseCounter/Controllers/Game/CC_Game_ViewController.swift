@@ -54,8 +54,11 @@ public class CC_Game_ViewController : CC_ViewController {
 	}
 	internal var hitsCount:Int = 0
 	private var perfectStreak:Int = 0
-	private let comboThreshold:Int = 5 // Le bonus de combo s'active après 5 hits
+	private let comboStreakRequired:Int = 3 // Nombre de perfects consécutifs requis pour activer le combo
 	internal lazy var zoneView: UIView = .init()
+	
+	// Si true, un miss termine la partie. Peut être surchargé par les sous-classes.
+	internal var missEndsGame: Bool { return true }
 	
 	internal func updateTitle() {
 		
@@ -95,11 +98,10 @@ public class CC_Game_ViewController : CC_ViewController {
 		let initialSize: CGFloat = targetSize * 15.0
 		
 		// Calculer la durée en fonction du nombre de succès
-		// Commence à 2.0s et diminue progressivement jusqu'à un minimum de 0.6s
+		// Commence à 2.0s et diminue progressivement sans limite
 		let baseDuration: TimeInterval = 2.0
-		let minDuration: TimeInterval = 0.6
 		let speedIncrement: TimeInterval = 0.015 // Réduit de 0.015s par point (progression lente)
-		let animationDuration = max(minDuration, baseDuration - (Double(pointsCount) * speedIncrement))
+		let animationDuration = max(0.1, baseDuration - (Double(hitsCount) * speedIncrement))
 		
 		// Container pour la zone QTE
 		let qteContainer = UIView()
@@ -238,9 +240,9 @@ public class CC_Game_ViewController : CC_ViewController {
 					
 					self?.perfectStreak += 1
 					
-					// Bonus de combo après le seuil : +1 point si série de perfects
-					if let streak = self?.perfectStreak, let threshold = self?.comboThreshold, let hits = self?.hitsCount,
-					   hits > threshold && streak > 1 {
+					// Bonus de combo : +1 point si série de X perfects consécutifs
+					if let streak = self?.perfectStreak, let required = self?.comboStreakRequired,
+					   streak > required {
 						
 						earnedPoints += 1
 					}
@@ -281,6 +283,9 @@ public class CC_Game_ViewController : CC_ViewController {
 				CC_Audio.shared.playSound(.Error)
 				CC_Feedback.shared.make(.Error)
 				
+				// Afficher le feedback d'erreur
+				self?.showMissFeedback(in: qteContainer)
+				
 				UIView.animation {
 					
 					targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.4)
@@ -292,7 +297,13 @@ public class CC_Game_ViewController : CC_ViewController {
 					qteContainer.removeFromSuperview()
 				}
 				
-				self?.gameOver()
+				if self?.missEndsGame == true {
+					self?.gameOver()
+				} else {
+					UIApplication.wait { [weak self] in
+						self?.createZone()
+					}
+				}
 			}
 		})
 		targetCircle.addGestureRecognizer(tapGesture)
@@ -314,6 +325,9 @@ public class CC_Game_ViewController : CC_ViewController {
 			CC_Audio.shared.playSound(.Error)
 			CC_Feedback.shared.make(.Error)
 			
+			// Afficher le feedback d'erreur
+			self?.showMissFeedback(in: qteContainer)
+			
 			UIView.animation {
 				
 				targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.4)
@@ -325,7 +339,13 @@ public class CC_Game_ViewController : CC_ViewController {
 				qteContainer.removeFromSuperview()
 			}
 			
-			self?.gameOver()
+			if self?.missEndsGame == true {
+				self?.gameOver()
+			} else {
+				UIApplication.wait { [weak self] in
+					self?.createZone()
+				}
+			}
 		})
 		missedTapGesture.require(toFail: tapGesture)
 		zoneView.addGestureRecognizer(missedTapGesture)
@@ -344,6 +364,12 @@ public class CC_Game_ViewController : CC_ViewController {
 				// Hook pour les sous-classes
 				self?.onMiss()
 				
+				CC_Audio.shared.playSound(.Error)
+				CC_Feedback.shared.make(.Error)
+				
+				// Afficher le feedback d'erreur
+				self?.showMissFeedback(in: qteContainer)
+				
 				UIView.animation(0.3, {
 					
 					qteContainer.alpha = 0
@@ -353,7 +379,13 @@ public class CC_Game_ViewController : CC_ViewController {
 					qteContainer.removeFromSuperview()
 				})
 				
-				self?.gameOver()
+				if self?.missEndsGame == true {
+					self?.gameOver()
+				} else {
+					UIApplication.wait { [weak self] in
+						self?.createZone()
+					}
+				}
 			}
 		})
 	}
@@ -363,7 +395,8 @@ public class CC_Game_ViewController : CC_ViewController {
 	}
 	
 	internal func onMiss() {
-		// Hook pour les sous-classes
+		// Reset le streak de perfect
+		perfectStreak = 0
 	}
 	
 	internal func showHitFeedback(_ hitType: HitType, bonus: Int = 0, in container: UIView) {
@@ -412,9 +445,53 @@ public class CC_Game_ViewController : CC_ViewController {
 		})
 	}
 	
+	internal func showMissFeedback(in container: UIView) {
+		
+		let feedbackLabel = CC_Label(String(key: "game.hit.wrong"))
+		feedbackLabel.font = Fonts.Content.Title.H2
+		feedbackLabel.textColor = Colors.Hits.Wrong
+		feedbackLabel.textAlignment = .center
+		feedbackLabel.alpha = 0
+		feedbackLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+		zoneView.addSubview(feedbackLabel)
+		
+		// Positionner au centre de la zone
+		let containerCenter = container.center
+		feedbackLabel.snp.makeConstraints { make in
+			make.centerX.equalTo(containerCenter.x)
+			make.centerY.equalTo(containerCenter.y)
+		}
+		
+		UIView.animation(0.15, {
+			
+			feedbackLabel.alpha = 1
+			feedbackLabel.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+			
+		}, {
+			
+			UIView.animation(0.1, {
+				
+				feedbackLabel.transform = .identity
+				
+			}, {
+				
+				UIView.animation(0.4, {
+					
+					feedbackLabel.alpha = 0
+					feedbackLabel.transform = CGAffineTransform(translationX: 0, y: -50)
+					
+				}, {
+					
+					feedbackLabel.removeFromSuperview()
+				})
+			})
+		})
+	}
+	
 	internal func gameOver() {
 		
 		let alertViewController: CC_Alert_ViewController = .init()
+		alertViewController.backgroundView.isUserInteractionEnabled = false
 		var presentCompletion:(()->Void)?
 		
 		let bestScore:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0

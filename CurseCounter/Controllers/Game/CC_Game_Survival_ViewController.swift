@@ -15,23 +15,34 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	private let greatBonus: TimeInterval = 1.0
 	private let missPenalty: TimeInterval = 5.0
 	
+	private var isGameOver: Bool = false
+	
 	private var remainingTime: TimeInterval = 30.0 {
 		
 		didSet {
 			
-			updateTitle()
-			
-			if remainingTime <= 0 {
+			if remainingTime <= 0 && !isGameOver {
 				
 				remainingTime = 0
+				isGameOver = true
 				countdownTimer?.invalidate()
 				countdownTimer = nil
+				
+				// Retirer immédiatement tous les gesture recognizers
+				zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
+				zoneView.subviews.forEach { $0.removeFromSuperview() }
+				
 				gameOver()
 			}
+			
+			updateTitle()
 		}
 	}
 	
 	private var countdownTimer: Timer?
+	
+	// En mode survie, un miss ne termine pas la partie (sauf si temps = 0)
+	override internal var missEndsGame: Bool { return isGameOver }
 	
 	public override func loadView() {
 		
@@ -71,6 +82,8 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	
 	override internal func onHit(_ hitType: HitType) {
 		
+		guard !isGameOver else { return }
+		
 		switch hitType {
 		case .perfect:
 			remainingTime += perfectBonus
@@ -83,6 +96,9 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	
 	override internal func onMiss() {
 		
+		super.onMiss()
+		
+		guard !isGameOver else { return }
 		remainingTime -= missPenalty
 	}
 	
