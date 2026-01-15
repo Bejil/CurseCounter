@@ -56,6 +56,7 @@ public class CC_Game_ViewController : CC_ViewController {
 	private var perfectStreak:Int = 0
 	private let comboStreakRequired:Int = 3 // Nombre de perfects consécutifs requis pour activer le combo
 	internal lazy var zoneView: UIView = .init()
+	private var isGameOverDisplayed: Bool = false
 	
 	// Si true, un miss termine la partie. Peut être surchargé par les sous-classes.
 	internal var missEndsGame: Bool { return true }
@@ -489,6 +490,13 @@ public class CC_Game_ViewController : CC_ViewController {
 	}
 	
 	internal func gameOver() {
+		
+		// Empêcher les appels multiples
+		guard !isGameOverDisplayed else { return }
+		isGameOverDisplayed = true
+		
+		// Retirer les gesture recognizers pour empêcher les interactions
+		zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
 		
 		let alertViewController: CC_Alert_ViewController = .init()
 		alertViewController.backgroundView.isUserInteractionEnabled = false

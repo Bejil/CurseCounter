@@ -16,6 +16,7 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	private let missPenalty: TimeInterval = 5.0
 	
 	private var isGameOver: Bool = false
+	private var hasDisplayedGameOver: Bool = false
 	
 	private var remainingTime: TimeInterval = 30.0 {
 		
@@ -103,6 +104,10 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	}
 	
 	override internal func gameOver() {
+		
+		// Empêcher les appels multiples
+		guard !hasDisplayedGameOver else { return }
+		hasDisplayedGameOver = true
 		
 		countdownTimer?.invalidate()
 		countdownTimer = nil
