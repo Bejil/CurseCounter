@@ -10,7 +10,7 @@ import SnapKit
 
 public class CC_Game_ViewController : CC_ViewController {
 	
-	private enum HitType: Int {
+	internal enum HitType: Int {
 		
 		case good = 1
 		case great = 2
@@ -45,15 +45,22 @@ public class CC_Game_ViewController : CC_ViewController {
 		}
 	}
 	
-	private var pointsCount:Int = 0 {
+	internal var pointsCount:Int = 0 {
 		
 		didSet {
 			
-			title = "\(pointsCount) " + String(key: "game.points")
+			updateTitle()
 		}
 	}
-	private var hitsCount:Int = 0
-	private lazy var zoneView: UIView = .init()
+	internal var hitsCount:Int = 0
+	private var perfectStreak:Int = 0
+	private let comboThreshold:Int = 5 // Le bonus de combo s'active après 5 hits
+	internal lazy var zoneView: UIView = .init()
+	
+	internal func updateTitle() {
+		
+		title = "\(pointsCount) " + String(key: "game.points")
+	}
 	
 	public override func loadView() {
 		
@@ -61,7 +68,7 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		isModal = true
 		
-		title = "\(pointsCount) " + String(key: "game.points")
+		updateTitle()
 		
 		let stackView: UIStackView = .init(arrangedSubviews: [zoneView])
 		stackView.axis = .vertical
@@ -79,7 +86,7 @@ public class CC_Game_ViewController : CC_ViewController {
 		createZone()
 	}
 	
-	private func createZone() {
+	internal func createZone() {
 		
 		// Retirer les anciens gesture recognizers
 		zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
@@ -88,10 +95,10 @@ public class CC_Game_ViewController : CC_ViewController {
 		let initialSize: CGFloat = targetSize * 15.0
 		
 		// Calculer la durée en fonction du nombre de succès
-		// Commence à 1.2s et diminue progressivement jusqu'à un minimum de 0.5s
+		// Commence à 2.0s et diminue progressivement jusqu'à un minimum de 0.6s
 		let baseDuration: TimeInterval = 2.0
-		let minDuration: TimeInterval = 0.5
-		let speedIncrement: TimeInterval = 0.05 // Réduit de 0.05s par succès
+		let minDuration: TimeInterval = 0.6
+		let speedIncrement: TimeInterval = 0.015 // Réduit de 0.015s par point (progression lente)
 		let animationDuration = max(minDuration, baseDuration - (Double(pointsCount) * speedIncrement))
 		
 		// Container pour la zone QTE
@@ -221,17 +228,40 @@ public class CC_Game_ViewController : CC_ViewController {
 				// Déterminer le type de hit
 				let hitType = HitType.forPrecision(precisionValue)
 				
-				// Incrémenter le compteur de points
-				self?.pointsCount += hitType.points
-				
 				// Incrémenter le compteur de succès
 				self?.hitsCount += 1
+				
+				// Calculer les points avec bonus de combo
+				var earnedPoints = hitType.points
+				
+				if hitType == .perfect {
+					
+					self?.perfectStreak += 1
+					
+					// Bonus de combo après le seuil : +1 point si série de perfects
+					if let streak = self?.perfectStreak, let threshold = self?.comboThreshold, let hits = self?.hitsCount,
+					   hits > threshold && streak > 1 {
+						
+						earnedPoints += 1
+					}
+				}
+				else {
+					
+					// Reset le streak si ce n'est pas un perfect
+					self?.perfectStreak = 0
+				}
+				
+				// Incrémenter le compteur de points
+				self?.pointsCount += earnedPoints
+				
+				// Hook pour les sous-classes
+				self?.onHit(hitType)
 				
 				CC_Audio.shared.playSound(.Success)
 				CC_Feedback.shared.make(.Success)
 				
-				// Afficher le feedback
-				self?.showHitFeedback(hitType, in: qteContainer)
+				// Afficher le feedback avec bonus
+				self?.showHitFeedback(hitType, bonus: earnedPoints - hitType.points, in: qteContainer)
 				
 				targetCircle.pulse(hitType.color) {
 					
@@ -244,6 +274,9 @@ public class CC_Game_ViewController : CC_ViewController {
 				}
 			}
 			else {
+				
+				// Hook pour les sous-classes
+				self?.onMiss()
 				
 				CC_Audio.shared.playSound(.Error)
 				CC_Feedback.shared.make(.Error)
@@ -275,14 +308,22 @@ public class CC_Game_ViewController : CC_ViewController {
 			colorTimer?.invalidate()
 			colorTimer = nil
 			
-			UIView.animation(0.3, {
+			// Hook pour les sous-classes
+			self?.onMiss()
+			
+			CC_Audio.shared.playSound(.Error)
+			CC_Feedback.shared.make(.Error)
+			
+			UIView.animation {
 				
-				qteContainer.alpha = 0
-				
-			}, {
+				targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.4)
+				targetCircle.layer.borderColor = Colors.Hits.Wrong.cgColor
+			}
+			
+			targetCircle.pulse(Colors.Hits.Wrong) {
 				
 				qteContainer.removeFromSuperview()
-			})
+			}
 			
 			self?.gameOver()
 		})
@@ -300,6 +341,9 @@ public class CC_Game_ViewController : CC_ViewController {
 				isActive = false
 				hasBeenTapped = true
 				
+				// Hook pour les sous-classes
+				self?.onMiss()
+				
 				UIView.animation(0.3, {
 					
 					qteContainer.alpha = 0
@@ -314,10 +358,21 @@ public class CC_Game_ViewController : CC_ViewController {
 		})
 	}
 	
-	private func showHitFeedback(_ hitType: HitType, in container: UIView) {
+	internal func onHit(_ hitType: HitType) {
+		// Hook pour les sous-classes
+	}
+	
+	internal func onMiss() {
+		// Hook pour les sous-classes
+	}
+	
+	internal func showHitFeedback(_ hitType: HitType, bonus: Int = 0, in container: UIView) {
 		
-		let feedbackLabel = CC_Label(hitType.text)
-		feedbackLabel.font = Fonts.Content.Title.H1
+		// Texte avec indicateur de combo si bonus présent
+		let text = bonus > 0 ? String(key: "game.hit.combo") : hitType.text
+		
+		let feedbackLabel = CC_Label(text)
+		feedbackLabel.font = Fonts.Content.Title.H2
 		feedbackLabel.textColor = hitType.color
 		feedbackLabel.textAlignment = .center
 		feedbackLabel.alpha = 0
@@ -357,7 +412,7 @@ public class CC_Game_ViewController : CC_ViewController {
 		})
 	}
 	
-	private func gameOver() {
+	internal func gameOver() {
 		
 		let alertViewController: CC_Alert_ViewController = .init()
 		var presentCompletion:(()->Void)?

@@ -10,14 +10,27 @@ import SnapKit
 
 public class CC_Menu_ViewController : CC_ViewController {
 	
-	private lazy var newGameStartButton:CC_Button = {
+	private lazy var classicGameButton:CC_Button = {
 		
 		$0.image = UIImage(systemName: "dot.circle.and.hand.point.up.left.fill")
 		return $0
 		
-	}(CC_Button(String(key: "menu.button.newGame.title")) { _ in
+	}(CC_Button(String(key: "menu.button.game.classic.title")) { _ in
 		
 		let navigationController:CC_NavigationController = .init(rootViewController: CC_Game_ViewController())
+		navigationController.navigationBar.prefersLargeTitles = false
+		UI.MainController.present(navigationController, animated: true)
+	})
+	
+	private lazy var survivalGameButton:CC_Button = {
+		
+		$0.image = UIImage(systemName: "timer")
+		$0.type = .secondary
+		return $0
+		
+	}(CC_Button(String(key: "menu.button.game.survival.title")) { _ in
+		
+		let navigationController:CC_NavigationController = .init(rootViewController: CC_Game_Survival_ViewController())
 		navigationController.navigationBar.prefersLargeTitles = false
 		UI.MainController.present(navigationController, animated: true)
 	})
@@ -35,7 +48,7 @@ public class CC_Menu_ViewController : CC_ViewController {
 		let subtitleLabel:CC_Label = .init(String(key: "menu.subtitle"))
 		subtitleLabel.textAlignment = .center
 		
-		let stackView:UIStackView = .init(arrangedSubviews: [titleLabel,subtitleLabel,newGameStartButton,CC_Settings_Button()])
+		let stackView:UIStackView = .init(arrangedSubviews: [titleLabel,subtitleLabel,classicGameButton,survivalGameButton,CC_Settings_Button()])
 		stackView.axis = .vertical
 		stackView.spacing = 1.5*UI.Margins
 		stackView.setCustomSpacing(1.5*stackView.spacing, after: subtitleLabel)
@@ -61,7 +74,10 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 		super.viewWillAppear(animated)
 		
-		let bestScore:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0
-		newGameStartButton.subtitle = bestScore > 0 ? String(key: "menu.button.newGame.subtitle") + " \(bestScore)" : nil
+		let bestScoreClassic:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0
+		classicGameButton.subtitle = bestScoreClassic > 0 ? String(key: "menu.button.game.classic.subtitle") + " \(bestScoreClassic)" : nil
+		
+		let bestScoreSurvival:Int = (UserDefaults.get(.bestScoreSurvival) as? Int) ?? 0
+		survivalGameButton.subtitle = bestScoreSurvival > 0 ? String(key: "menu.button.game.survival.subtitle") + " \(bestScoreSurvival)" : nil
 	}
 }

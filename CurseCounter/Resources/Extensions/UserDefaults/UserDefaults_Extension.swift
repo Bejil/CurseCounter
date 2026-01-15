@@ -16,6 +16,7 @@ extension UserDefaults {
 		case musicEnabled = "musicEnabled"
 		
 		case bestScore = "bestScore"
+		case bestScoreSurvival = "bestScoreSurvival"
 	}
 	
 	public static func set(_ value:Any?, _ key:UserDefaults.Keys) {

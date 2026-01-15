@@ -17,8 +17,10 @@
 "menu.title.0" = "Curse";
 "menu.title.1" = "Counter";
 "menu.subtitle" = "Arriverez-vous à garder le rythme ?";
-"menu.button.newGame.title" = "Nouvelle partie";
-"menu.button.newGame.subtitle" = "Meilleur score:";
+"menu.button.game.classic.title" = "Partie classique";
+"menu.button.game.classic.subtitle" = "Meilleur score:";
+"menu.button.game.survival.title" = "Mode survie";
+"menu.button.game.survival.subtitle" = "Meilleur score:";
 
 //MARK: - Game
 "game.points" = "points";
@@ -26,9 +28,14 @@
 "game.over.alert.hits" = "%i zones touchées";
 "game.over.default.alert.title" = "Perdu !";
 "game.over.bestScore.alert.title" = "Nouveau record !";
+"game.hit.combo" = "Combo";
 "game.hit.3" = "+3";
 "game.hit.2" = "+2";
 "game.hit.1" = "+1";
+
+//MARK: - Game Survival
+"game.survival.over.default.alert.title" = "Temps écoulé !";
+"game.survival.over.bestScore.alert.title" = "Nouveau record !";
 
 //MARK: - Settings
 "settings.button" = "Réglages";
