@@ -97,14 +97,13 @@ public class CC_Audio : NSObject {
 				  let url = cachedPlayer.url,
 				  let player = try? AVAudioPlayer(contentsOf: url) else { return }
 			
-			player.delegate = self
 			player.prepareToPlay()
 			
 			DispatchQueue.main.async {
+				player.delegate = self
 				self.activeSoundPlayers.append(player)
+				player.play()
 			}
-			
-			player.play()
 		}
 	}
 	

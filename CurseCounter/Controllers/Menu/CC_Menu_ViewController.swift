@@ -39,6 +39,8 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 		super.loadView()
 		
+		navigationItem.rightBarButtonItem = .init(customView: CC_Settings_Button())
+		
 		let titleImageView:UIImageView = .init(image: UIImage(systemName: "smallcircle.filled.circle"))
 		titleImageView.tintColor = Colors.Content.Text.withAlphaComponent(0.75)
 		titleImageView.contentMode = .scaleAspectFit
@@ -55,7 +57,7 @@ public class CC_Menu_ViewController : CC_ViewController {
 		let subtitleLabel:CC_Label = .init(String(key: "menu.subtitle"))
 		subtitleLabel.textAlignment = .center
 		
-		let stackView:UIStackView = .init(arrangedSubviews: [titleImageView,titleLabel,subtitleLabel,classicGameButton,survivalGameButton,CC_Settings_Button()])
+		let stackView:UIStackView = .init(arrangedSubviews: [titleImageView,titleLabel,subtitleLabel,classicGameButton,survivalGameButton])
 		stackView.axis = .vertical
 		stackView.spacing = 1.5*UI.Margins
 		stackView.setCustomSpacing(2*stackView.spacing, after: subtitleLabel)
