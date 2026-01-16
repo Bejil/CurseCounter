@@ -44,7 +44,10 @@ public class CC_Game_ViewController : CC_ViewController {
 			return String(key: "game.hit.\(rawValue)")
 		}
 	}
-	
+	internal var bestScoreKey: UserDefaults.Keys? {
+		
+		return nil
+	}
 	internal var pointsCount:Int = 0 {
 		
 		didSet {
@@ -54,25 +57,18 @@ public class CC_Game_ViewController : CC_ViewController {
 	}
 	internal var hitsCount:Int = 0
 	private var perfectStreak:Int = 0
-	private let comboStreakRequired:Int = 3 // Nombre de perfects consécutifs requis pour activer le combo
+	internal let comboStreakRequired:Int = 5 // Nombre de perfects consécutifs requis pour activer le combo
 	internal lazy var zoneView: UIView = .init()
 	private var isGameOverDisplayed: Bool = false
-	
-	// Si true, un miss termine la partie. Peut être surchargé par les sous-classes.
 	internal var missEndsGame: Bool { return true }
-	
-	internal func updateTitle() {
-		
-		title = "\(pointsCount) " + String(key: "game.points")
-	}
+	private var isPaused: Bool = false
+	private var isGameStopped: Bool = false
+	private var colorTimer: Timer?
+	private var pausedTime: CFTimeInterval = 0
 	
 	public override func loadView() {
 		
 		super.loadView()
-		
-		isModal = true
-		
-		updateTitle()
 		
 		let stackView: UIStackView = .init(arrangedSubviews: [zoneView])
 		stackView.axis = .vertical
@@ -83,9 +79,148 @@ public class CC_Game_ViewController : CC_ViewController {
 		}
 	}
 	
-	public override func viewDidAppear(_ animated: Bool) {
+	public override func close() {
 		
-		super.viewDidAppear(animated)
+		pauseGame()
+		
+		let alertController:CC_Alert_ViewController = .init()
+		alertController.backgroundView.isUserInteractionEnabled = false
+		alertController.title = String(key: "game.quit.alert.title")
+		alertController.add(String(key: "game.quit.alert.message"))
+		alertController.add(String(key: "game.quit.alert.warning"))
+		let button = alertController.addButton(title: String(key: "game.quit.alert.button.quit")) { [weak self] _ in
+			
+			self?.stopGame()
+			
+			alertController.close { [weak self] in
+				
+				self?.dismiss()
+			}
+		}
+		button.type = .delete
+		alertController.addCancelButton() { [weak self] _ in
+			
+			self?.resumeGame()
+		}
+		alertController.present()
+	}
+	
+	internal func pauseGame() {
+		
+		guard !isPaused else { return }
+		isPaused = true
+		
+		// Stopper le timer de couleur
+		colorTimer?.invalidate()
+		
+		// Mettre en pause toutes les animations dans la zoneView
+		zoneView.subviews.forEach { subview in
+			
+			let pausedTime = subview.layer.convertTime(CACurrentMediaTime(), from: nil)
+			subview.layer.speed = 0
+			subview.layer.timeOffset = pausedTime
+		}
+		
+		// Désactiver les interactions
+		zoneView.isUserInteractionEnabled = false
+	}
+	
+	internal func resumeGame() {
+		
+		guard isPaused else { return }
+		isPaused = false
+		
+		// Reprendre toutes les animations dans la zoneView
+		zoneView.subviews.forEach { subview in
+			
+			let pausedTime = subview.layer.timeOffset
+			subview.layer.speed = 1
+			subview.layer.timeOffset = 0
+			subview.layer.beginTime = 0
+			let timeSincePause = subview.layer.convertTime(CACurrentMediaTime(), from: nil) - pausedTime
+			subview.layer.beginTime = timeSincePause
+		}
+		
+		// Réactiver les interactions
+		zoneView.isUserInteractionEnabled = true
+	}
+	
+	internal func stopGame() {
+		
+		isGameStopped = true
+		
+		// Stopper le timer de couleur
+		colorTimer?.invalidate()
+		colorTimer = nil
+		
+		// Retirer toutes les animations et vues
+		zoneView.layer.removeAllAnimations()
+		zoneView.subviews.forEach { subview in
+			subview.layer.removeAllAnimations()
+			subview.removeFromSuperview()
+		}
+		
+		// Retirer tous les gesture recognizers
+		zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
+	}
+	
+	internal func updateTitle() {
+		
+		title = "\(pointsCount) " + String(key: "game.points")
+	}
+	
+	internal func showStartTutorial() {
+		
+		let tutorialViewController:CC_Tutorial_ViewController = .init()
+		tutorialViewController.items = [
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.countdown.3"),
+				timeInterval: 1.0,
+				closure: {
+					
+					CC_Audio.shared.playSound(.Tap)
+					CC_Feedback.shared.make(.On)
+				}
+			),
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.countdown.2"),
+				timeInterval: 1.0,
+				closure: {
+					
+					CC_Audio.shared.playSound(.Tap)
+					CC_Feedback.shared.make(.On)
+				}
+			),
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.countdown.1"),
+				timeInterval: 1.0,
+				closure: {
+					
+					CC_Audio.shared.playSound(.Button)
+					CC_Feedback.shared.make(.Success)
+				}
+			),
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.countdown.go"),
+				timeInterval: 1.0
+			)
+		]
+		tutorialViewController.completion = { [weak self] in
+			
+			self?.startGame()
+		}
+		tutorialViewController.present {
+			
+			CC_Audio.shared.playSound(.Tap)
+			CC_Feedback.shared.make(.On)
+		}
+	}
+	
+	internal func startGame() {
+		
+		isModal = true
+		
+		updateTitle()
 
 		createZone()
 	}
@@ -158,10 +293,7 @@ public class CC_Game_ViewController : CC_ViewController {
 		let activeZoneMultiplier: CGFloat = 8.0
 		let timeToSuccessZone = animationDuration * (initialSize - activeZoneMultiplier * targetSize) / (initialSize - targetSize)
 		
-		// Timer pour mettre à jour la couleur en temps réel
-		var colorTimer: Timer?
-		
-		UIApplication.wait(timeToSuccessZone) {
+		UIApplication.wait(timeToSuccessZone) { [weak self] in
 			
 			isActive = true
 			currentHitType = .good
@@ -174,7 +306,7 @@ public class CC_Game_ViewController : CC_ViewController {
 			}
 			
 			// Démarrer le timer pour les mises à jour de couleur (~60fps)
-			colorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
+			self?.colorTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
 				
 				guard isActive, !hasBeenTapped else { return }
 				
@@ -208,8 +340,8 @@ public class CC_Game_ViewController : CC_ViewController {
 			hasBeenTapped = true
 			
 			// Arrêter le timer
-			colorTimer?.invalidate()
-			colorTimer = nil
+			self?.colorTimer?.invalidate()
+			self?.colorTimer = nil
 			
 			if isActive {
 				
@@ -273,6 +405,7 @@ public class CC_Game_ViewController : CC_ViewController {
 					
 				UIApplication.wait { [weak self] in
 					
+					guard self?.isGameStopped != true else { return }
 					self?.createZone()
 				}
 			}
@@ -301,8 +434,9 @@ public class CC_Game_ViewController : CC_ViewController {
 				if self?.missEndsGame == true {
 					self?.gameOver()
 				} else {
-					UIApplication.wait { [weak self] in
-						self?.createZone()
+				UIApplication.wait { [weak self] in
+						guard self?.isGameStopped != true else { return }
+					self?.createZone()
 					}
 				}
 			}
@@ -317,8 +451,8 @@ public class CC_Game_ViewController : CC_ViewController {
 			isActive = false
 			
 			// Arrêter le timer
-			colorTimer?.invalidate()
-			colorTimer = nil
+			self?.colorTimer?.invalidate()
+			self?.colorTimer = nil
 			
 			// Hook pour les sous-classes
 			self?.onMiss()
@@ -344,6 +478,7 @@ public class CC_Game_ViewController : CC_ViewController {
 				self?.gameOver()
 			} else {
 				UIApplication.wait { [weak self] in
+					guard self?.isGameStopped != true else { return }
 					self?.createZone()
 				}
 			}
@@ -356,6 +491,8 @@ public class CC_Game_ViewController : CC_ViewController {
 			shrinkingCircle.transform = CGAffineTransform(scaleX: targetSize / initialSize, y: targetSize / initialSize)
 			
 		}, { [weak self] in
+			
+			guard self?.isGameStopped != true else { return }
 			
 			if isActive && !hasBeenTapped {
 				
@@ -384,6 +521,7 @@ public class CC_Game_ViewController : CC_ViewController {
 					self?.gameOver()
 				} else {
 					UIApplication.wait { [weak self] in
+						guard self?.isGameStopped != true else { return }
 						self?.createZone()
 					}
 				}
@@ -392,11 +530,11 @@ public class CC_Game_ViewController : CC_ViewController {
 	}
 	
 	internal func onHit(_ hitType: HitType) {
-		// Hook pour les sous-classes
+		
 	}
 	
 	internal func onMiss() {
-		// Reset le streak de perfect
+		
 		perfectStreak = 0
 	}
 	
@@ -498,43 +636,46 @@ public class CC_Game_ViewController : CC_ViewController {
 		// Retirer les gesture recognizers pour empêcher les interactions
 		zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
 		
-		let alertViewController: CC_Alert_ViewController = .init()
-		alertViewController.backgroundView.isUserInteractionEnabled = false
-		var presentCompletion:(()->Void)?
-		
-		let bestScore:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0
-		if pointsCount > bestScore {
+		if let bestScoreKey {
 			
-			UserDefaults.set(pointsCount, .bestScore)
+			let alertViewController: CC_Alert_ViewController = .init()
+			alertViewController.backgroundView.isUserInteractionEnabled = false
+			var presentCompletion:(()->Void)?
 			
-			CC_Audio.shared.playSound(.Success)
-			CC_Feedback.shared.make(.Success)
-			
-			alertViewController.title = String(key: "game.over.bestScore.alert.title")
-			alertViewController.dismissHandler = {
+			let bestScore: Int = (UserDefaults.get(bestScoreKey) as? Int) ?? 0
+			if pointsCount > bestScore {
 				
-				CC_Confettis.stop()
+				UserDefaults.set(pointsCount, bestScoreKey)
+				
+				CC_Audio.shared.playSound(.Success)
+				CC_Feedback.shared.make(.Success)
+				
+				alertViewController.title = String(key: "game.over.bestScore.alert.title")
+				alertViewController.dismissHandler = {
+					
+					CC_Confettis.stop()
+				}
+				
+				presentCompletion = {
+					
+					CC_Confettis.start()
+				}
+			}
+			else {
+				
+				CC_Audio.shared.playSound(.Error)
+				CC_Feedback.shared.make(.Error)
+				
+				alertViewController.title = String(key: "game.over.default.alert.title")
 			}
 			
-			presentCompletion = {
+			alertViewController.add(String(format: String(key: "game.over.alert.points"), pointsCount))
+			alertViewController.add(String(format: String(key: "game.over.alert.hits"), hitsCount))
+			alertViewController.addDismissButton { [weak self] _ in
 				
-				CC_Confettis.start()
+				self?.dismiss()
 			}
+			alertViewController.present(presentCompletion)
 		}
-		else {
-			
-			CC_Audio.shared.playSound(.Error)
-			CC_Feedback.shared.make(.Error)
-			
-			alertViewController.title = String(key: "game.over.default.alert.title")
-		}
-		
-		alertViewController.add(String(format: String(key: "game.over.alert.points"), pointsCount))
-		alertViewController.add(String(format: String(key: "game.over.alert.hits"), hitsCount))
-		alertViewController.addDismissButton { [weak self] _ in
-			
-			self?.close()
-		}
-		alertViewController.present(presentCompletion)
 	}
 }

@@ -17,7 +17,7 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 	}(CC_Button(String(key: "menu.button.game.classic.title")) { _ in
 		
-		let navigationController:CC_NavigationController = .init(rootViewController: CC_Game_ViewController())
+		let navigationController:CC_NavigationController = .init(rootViewController: CC_Game_Classic_ViewController())
 		navigationController.navigationBar.prefersLargeTitles = false
 		UI.MainController.present(navigationController, animated: true)
 	})
@@ -39,6 +39,13 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 		super.loadView()
 		
+		let titleImageView:UIImageView = .init(image: UIImage(systemName: "smallcircle.filled.circle"))
+		titleImageView.tintColor = Colors.Content.Text.withAlphaComponent(0.75)
+		titleImageView.contentMode = .scaleAspectFit
+		titleImageView.snp.makeConstraints { make in
+			make.size.equalTo(6*UI.Margins)
+		}
+		
 		let titleLabel:CC_Label = .init([String(key: "menu.title.0"),String(key: "menu.title.1")].joined(separator: " "))
 		titleLabel.font = Fonts.Content.Title.H1
 		titleLabel.textColor = Colors.Content.Title
@@ -48,10 +55,10 @@ public class CC_Menu_ViewController : CC_ViewController {
 		let subtitleLabel:CC_Label = .init(String(key: "menu.subtitle"))
 		subtitleLabel.textAlignment = .center
 		
-		let stackView:UIStackView = .init(arrangedSubviews: [titleLabel,subtitleLabel,classicGameButton,survivalGameButton,CC_Settings_Button()])
+		let stackView:UIStackView = .init(arrangedSubviews: [titleImageView,titleLabel,subtitleLabel,classicGameButton,survivalGameButton,CC_Settings_Button()])
 		stackView.axis = .vertical
 		stackView.spacing = 1.5*UI.Margins
-		stackView.setCustomSpacing(1.5*stackView.spacing, after: subtitleLabel)
+		stackView.setCustomSpacing(2*stackView.spacing, after: subtitleLabel)
 		
 		let scrollView:CC_ScrollView = .init()
 		scrollView.showsVerticalScrollIndicator = false
@@ -74,10 +81,10 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 		super.viewWillAppear(animated)
 		
-		let bestScoreClassic:Int = (UserDefaults.get(.bestScore) as? Int) ?? 0
+		let bestScoreClassic:Int = (UserDefaults.get(.gameClassicBestScore) as? Int) ?? 0
 		classicGameButton.subtitle = bestScoreClassic > 0 ? String(key: "menu.button.game.classic.subtitle") + " \(bestScoreClassic)" : nil
 		
-		let bestScoreSurvival:Int = (UserDefaults.get(.bestScoreSurvival) as? Int) ?? 0
+		let bestScoreSurvival:Int = (UserDefaults.get(.gameSurvivalBestScore) as? Int) ?? 0
 		survivalGameButton.subtitle = bestScoreSurvival > 0 ? String(key: "menu.button.game.survival.subtitle") + " \(bestScoreSurvival)" : nil
 	}
 }

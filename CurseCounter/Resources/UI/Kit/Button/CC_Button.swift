@@ -17,6 +17,7 @@ public class CC_Button : UIButton {
 		case tertiary
 		case text
 		case navigation
+		case delete
 	}
 	
 	public enum ButtonStyle {
@@ -410,6 +411,8 @@ public class CC_Button : UIButton {
 			return Colors.Button.Tertiary.Background
 		case .navigation:
 			return Colors.Button.Navigation.Background
+		case .delete:
+			return Colors.Button.Delete.Background
 		case .text:
 			return Colors.Button.Text.Background
 		}
@@ -425,6 +428,8 @@ public class CC_Button : UIButton {
 			return Colors.Button.Tertiary.Content
 		case .navigation:
 			return Colors.Button.Navigation.Content
+		case .delete:
+			return Colors.Button.Delete.Content
 		case .text:
 			return Colors.Button.Text.Content
 		}

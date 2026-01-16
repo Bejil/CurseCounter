@@ -23,6 +23,10 @@
 "menu.button.game.survival.subtitle" = "Meilleur score:";
 
 //MARK: - Game
+"game.quit.alert.title" = "Attention";
+"game.quit.alert.message" = "Voulez-vous vraiment quitter la partie ?";
+"game.quit.alert.warning" = "Votre score ne sera pas sauvegardé et vous perdrez vos points";
+"game.quit.alert.button.quit" = "Quitter";
 "game.points" = "points";
 "game.over.alert.points" = "%i points";
 "game.over.alert.hits" = "%i zones touchées";
@@ -33,10 +37,26 @@
 "game.hit.3" = "+3";
 "game.hit.2" = "+2";
 "game.hit.1" = "+1";
+"game.countdown.3" = "3";
+"game.countdown.2" = "2";
+"game.countdown.1" = "1";
+"game.countdown.go" = "C'est parti !";
+
+//MARK: - Game Classic
+"game.classic.tutorial.main.title" = "Partie classique";
+"game.classic.tutorial.main.subtitle" = "Touchez les zones au bon moment !\n\nPlus vous êtes précis, plus vous gagnez de points.\nUne seule erreur et c'est terminé 😝";
+"game.classic.tutorial.main.button" = "Suivant...";
+"game.classic.tutorial.combo.title" = "Combo";
+"game.classic.tutorial.combo.subtitle" = "Enchaînez les parfaits pour déclencher un combo !\n\nAprès %i parfaits consécutifs, chaque nouveau parfait vous rapporte un point bonus 🔥";
+"game.classic.tutorial.combo.button" = "C'est parti !";
 
 //MARK: - Game Survival
-"game.survival.over.default.alert.title" = "Temps écoulé !";
-"game.survival.over.bestScore.alert.title" = "Nouveau record !";
+"game.survival.tutorial.main.title" = "Mode survie";
+"game.survival.tutorial.main.subtitle" = "Vous avez 30 secondes pour marquer un maximum de points !\n\nChaque parfait ajoute +3s ⏱️\nChaque super ajoute +1s ⏱️\nChaque erreur retire -5s ⚠️\n\nLe jeu s'arrête quand le temps atteint zéro !";
+"game.survival.tutorial.main.button" = "Suivant...";
+"game.survival.tutorial.combo.title" = "Combo";
+"game.survival.tutorial.combo.subtitle" = "Enchaînez les parfaits pour déclencher un combo !\n\nAprès %i parfaits consécutifs, chaque nouveau parfait vous rapporte un point bonus 🔥";
+"game.survival.tutorial.combo.button" = "C'est parti !";
 
 //MARK: - Settings
 "settings.button" = "Réglages";

@@ -10,14 +10,16 @@ import SnapKit
 
 public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	
+	override var bestScoreKey: UserDefaults.Keys? {
+		
+		return .gameSurvivalBestScore
+	}
 	private let initialTime: TimeInterval = 30.0
 	private let perfectBonus: TimeInterval = 3.0
 	private let greatBonus: TimeInterval = 1.0
 	private let missPenalty: TimeInterval = 5.0
-	
 	private var isGameOver: Bool = false
 	private var hasDisplayedGameOver: Bool = false
-	
 	private var remainingTime: TimeInterval = 30.0 {
 		
 		didSet {
@@ -39,24 +41,69 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 			updateTitle()
 		}
 	}
-	
 	private var countdownTimer: Timer?
-	
 	// En mode survie, un miss ne termine pas la partie (sauf si temps = 0)
 	override internal var missEndsGame: Bool { return isGameOver }
 	
-	public override func loadView() {
+	public override func viewWillAppear(_ animated: Bool) {
 		
-		super.loadView()
+		super.viewWillAppear(animated)
 		
-		remainingTime = initialTime
+		let tutorialViewController:CC_Tutorial_ViewController = .init()
+		tutorialViewController.key = .gameSurvivalTutorial
+		tutorialViewController.items = [
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.survival.tutorial.main.title"),
+				subtitle: String(key: "game.survival.tutorial.main.subtitle"),
+				button: String(key: "game.survival.tutorial.main.button")
+			),
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.survival.tutorial.combo.title"),
+				subtitle: String(format: String(key: "game.survival.tutorial.combo.subtitle"), comboStreakRequired),
+				button: String(key: "game.survival.tutorial.combo.button")
+			)
+		]
+		tutorialViewController.completion = { [weak self] in
+			
+			self?.showStartTutorial()
+		}
+		tutorialViewController.present()
 	}
 	
-	public override func viewDidAppear(_ animated: Bool) {
+	override func startGame() {
 		
-		super.viewDidAppear(animated)
+		super.startGame()
 		
 		startCountdown()
+	}
+	
+	override func pauseGame() {
+		
+		super.pauseGame()
+		
+		countdownTimer?.invalidate()
+		countdownTimer = nil
+	}
+	
+	override func resumeGame() {
+		
+		super.resumeGame()
+		
+		guard !isGameOver else { return }
+		
+		countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+			
+			self?.remainingTime -= 0.1
+		}
+	}
+	
+	override func stopGame() {
+		
+		super.stopGame()
+		
+		isGameOver = true
+		countdownTimer?.invalidate()
+		countdownTimer = nil
 	}
 	
 	public override func viewWillDisappear(_ animated: Bool) {
@@ -69,10 +116,8 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	
 	private func startCountdown() {
 		
-		countdownTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-			
-			self?.remainingTime -= 0.1
-		}
+		remainingTime = initialTime
+		resumeGame()
 	}
 	
 	override internal func updateTitle() {
@@ -105,52 +150,9 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 	
 	override internal func gameOver() {
 		
-		// Empêcher les appels multiples
-		guard !hasDisplayedGameOver else { return }
-		hasDisplayedGameOver = true
-		
 		countdownTimer?.invalidate()
 		countdownTimer = nil
 		
-		// Retirer les gesture recognizers pour empêcher les interactions
-		zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
-		
-		let alertViewController: CC_Alert_ViewController = .init()
-		var presentCompletion:(()->Void)?
-		
-		let bestScore: Int = (UserDefaults.get(.bestScoreSurvival) as? Int) ?? 0
-		if pointsCount > bestScore {
-			
-			UserDefaults.set(pointsCount, .bestScoreSurvival)
-			
-			CC_Audio.shared.playSound(.Success)
-			CC_Feedback.shared.make(.Success)
-			
-			alertViewController.title = String(key: "game.survival.over.bestScore.alert.title")
-			alertViewController.dismissHandler = {
-				
-				CC_Confettis.stop()
-			}
-			
-			presentCompletion = {
-				
-				CC_Confettis.start()
-			}
-		}
-		else {
-			
-			CC_Audio.shared.playSound(.Error)
-			CC_Feedback.shared.make(.Error)
-			
-			alertViewController.title = String(key: "game.survival.over.default.alert.title")
-		}
-		
-		alertViewController.add(String(format: String(key: "game.over.alert.points"), pointsCount))
-		alertViewController.add(String(format: String(key: "game.over.alert.hits"), hitsCount))
-		alertViewController.addDismissButton { [weak self] _ in
-			
-			self?.close()
-		}
-		alertViewController.present(presentCompletion)
+		super.gameOver()
 	}
 }
