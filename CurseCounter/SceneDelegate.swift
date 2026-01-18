@@ -23,13 +23,5 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		window?.rootViewController = navigationController
 		
 		window?.makeKeyAndVisible()
-		
-		CC_Alert_ViewController.presentLoading { alertController in
-			
-			CC_Ads.shared.presentAppOpening(nil, {
-				
-				alertController?.close()
-			})
-		}
 	}
 }

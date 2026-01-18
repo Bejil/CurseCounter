@@ -70,9 +70,15 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		super.loadView()
 		
-		let stackView: UIStackView = .init(arrangedSubviews: [zoneView,CC_Ads.shared.presentBanner(Ads.Banner.Game, self)])
+		let stackView: UIStackView = .init(arrangedSubviews: [zoneView])
 		stackView.axis = .vertical
 		stackView.spacing = UI.Margins
+		
+		if let bannerView = CC_Ads.shared.presentBanner(Ads.Banner.Game, self) {
+			
+			stackView.addArrangedSubview(bannerView)
+		}
+		
 		view.addSubview(stackView)
 		stackView.snp.makeConstraints { make in
 			make.edges.equalTo(view.safeAreaLayoutGuide).inset(UI.Margins)
@@ -107,13 +113,16 @@ public class CC_Game_ViewController : CC_ViewController {
 	
 	public override func dismiss(_ completion: (() -> Void)? = nil) {
 		
-		super.dismiss(completion)
-		
-		CC_Alert_ViewController.presentLoading { alertController in
+		super.dismiss {
 			
-			CC_Ads.shared.presentInterstitial(Ads.FullScreen.Game.End, nil, {
+			completion?()
+			
+			CC_Alert_ViewController.presentLoading({ alertController in
 				
-				alertController?.close(completion)
+				CC_Ads.shared.presentInterstitial(Ads.FullScreen.Game.End, nil, {
+					
+					alertController?.close(completion)
+				})
 			})
 		}
 	}

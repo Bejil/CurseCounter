@@ -71,11 +71,16 @@ public class CC_Menu_ViewController : CC_ViewController {
 		inAppButton.type = .navigation
 		inAppButton.titleFont = Fonts.Content.Button.Title
 		
-		let stackView:UIStackView = .init(arrangedSubviews: [titleImageView,titleLabel,subtitleLabel,classicGameButton,survivalGameButton,inAppButton,bannerView])
+		let stackView:UIStackView = .init(arrangedSubviews: [titleImageView,titleLabel,subtitleLabel,classicGameButton,survivalGameButton,inAppButton])
 		stackView.axis = .vertical
 		stackView.spacing = 1.5*UI.Margins
 		stackView.setCustomSpacing(2*stackView.spacing, after: subtitleLabel)
 		stackView.setCustomSpacing(2*stackView.spacing, after: survivalGameButton)
+		
+		if let bannerView {
+			
+			stackView.addArrangedSubview(bannerView)
+		}
 		
 		let scrollView:CC_ScrollView = .init()
 		scrollView.showsVerticalScrollIndicator = false
@@ -104,7 +109,7 @@ public class CC_Menu_ViewController : CC_ViewController {
 		let bestScoreSurvival:Int = (UserDefaults.get(.gameSurvivalBestScore) as? Int) ?? 0
 		survivalGameButton.subtitle = bestScoreSurvival > 0 ? String(key: "menu.button.game.survival.subtitle") + " \(bestScoreSurvival)" : nil
 		
-		bannerView.refresh()
+		bannerView?.refresh()
 	}
 	
 	private func prensentGameAd(_ completion:(()->Void)?) {

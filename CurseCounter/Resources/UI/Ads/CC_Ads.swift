@@ -104,19 +104,20 @@ public class CC_Ads : NSObject {
 		}
 	}
 	
-	public func presentBanner(_ identifier:String, _ rootViewController:UIViewController) -> BannerView {
-		
-		let bannerView:BannerView = .init(adSize: AdSizeBanner)
-		bannerView.adUnitID = identifier
-		bannerView.rootViewController = rootViewController
-		bannerView.delegate = self
+	public func presentBanner(_ identifier:String, _ rootViewController:UIViewController) -> BannerView? {
 		
 		if shouldDisplayAd {
 			
+			let bannerView:BannerView = .init(adSize: AdSizeBanner)
+			bannerView.adUnitID = identifier
+			bannerView.rootViewController = rootViewController
+			bannerView.delegate = self
 			bannerView.load(Request())
+			
+			return bannerView
 		}
 		
-		return bannerView
+		return nil
 	}
 }
 

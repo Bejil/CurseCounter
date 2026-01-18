@@ -10,6 +10,7 @@
 		D477DE522ED9AF9C00051CB9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D477DE512ED9AF9C00051CB9 /* SnapKit */; };
 		D4A6BC262F17A65700E931A9 /* SPConfetti in Frameworks */ = {isa = PBXBuildFile; productRef = D4A6BC252F17A65700E931A9 /* SPConfetti */; };
 		D4A6BCE82F1A9BA800E931A9 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = D4A6BCE72F1A9BA800E931A9 /* GoogleMobileAds */; };
+		D4FFAD832F1D79790047ED84 /* GoogleUserMessagingPlatform in Frameworks */ = {isa = PBXBuildFile; productRef = D4FFAD822F1D79790047ED84 /* GoogleUserMessagingPlatform */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 			files = (
 				D4A6BCE82F1A9BA800E931A9 /* GoogleMobileAds in Frameworks */,
 				D477DE522ED9AF9C00051CB9 /* SnapKit in Frameworks */,
+				D4FFAD832F1D79790047ED84 /* GoogleUserMessagingPlatform in Frameworks */,
 				D4A6BC262F17A65700E931A9 /* SPConfetti in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -90,6 +92,7 @@
 				D477DE512ED9AF9C00051CB9 /* SnapKit */,
 				D4A6BC252F17A65700E931A9 /* SPConfetti */,
 				D4A6BCE72F1A9BA800E931A9 /* GoogleMobileAds */,
+				D4FFAD822F1D79790047ED84 /* GoogleUserMessagingPlatform */,
 			);
 			productName = CurseCounter;
 			productReference = D477DCF62ED9A56200051CB9 /* CurseCounter.app */;
@@ -123,6 +126,7 @@
 				D477DE502ED9AF9C00051CB9 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				D4A6BC242F17A65700E931A9 /* XCRemoteSwiftPackageReference "SPConfetti" */,
 				D4A6BCE62F1A9BA800E931A9 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+				D4FFAD812F1D79790047ED84 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D477DCF72ED9A56200051CB9 /* Products */;
@@ -394,6 +398,14 @@
 				minimumVersion = 12.14.0;
 			};
 		};
+		D4FFAD812F1D79790047ED84 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-user-messaging-platform.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -411,6 +423,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D4A6BCE62F1A9BA800E931A9 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
 			productName = GoogleMobileAds;
+		};
+		D4FFAD822F1D79790047ED84 /* GoogleUserMessagingPlatform */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4FFAD812F1D79790047ED84 /* XCRemoteSwiftPackageReference "swift-package-manager-google-user-messaging-platform" */;
+			productName = GoogleUserMessagingPlatform;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
