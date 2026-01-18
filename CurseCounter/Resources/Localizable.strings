@@ -21,6 +21,7 @@
 "menu.button.game.classic.subtitle" = "Meilleur score:";
 "menu.button.game.survival.title" = "Mode survie";
 "menu.button.game.survival.subtitle" = "Meilleur score:";
+"menu.button.inApp" = "Marre des pubs ?";
 
 //MARK: - Game
 "game.quit.alert.title" = "Attention";

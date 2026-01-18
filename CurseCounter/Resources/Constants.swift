@@ -137,3 +137,23 @@ public struct Fonts {
 		}
 	}
 }
+
+public struct Ads {
+	
+	public struct FullScreen {
+		
+		static let AppOpening:String = "ca-app-pub-9540216894729209/6153578798"
+		
+		public struct Game {
+			
+			static let Start:String = "ca-app-pub-9540216894729209/8351354960"
+			static let End:String = "ca-app-pub-9540216894729209/7038273296"
+		}
+	}
+	
+	public struct Banner {
+		
+		static let Menu:String = "ca-app-pub-9540216894729209/7369445786"
+		static let Game:String = "ca-app-pub-9540216894729209/1961206432"
+	}
+}

@@ -14,6 +14,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 	
 	func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 		
+		CC_Ads.shared.start()
 		CC_Audio.shared.playMusic()
 		
 		return true

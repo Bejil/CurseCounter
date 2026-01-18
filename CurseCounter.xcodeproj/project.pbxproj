@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		D477DE522ED9AF9C00051CB9 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = D477DE512ED9AF9C00051CB9 /* SnapKit */; };
 		D4A6BC262F17A65700E931A9 /* SPConfetti in Frameworks */ = {isa = PBXBuildFile; productRef = D4A6BC252F17A65700E931A9 /* SPConfetti */; };
+		D4A6BCE82F1A9BA800E931A9 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = D4A6BCE72F1A9BA800E931A9 /* GoogleMobileAds */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D4A6BCE82F1A9BA800E931A9 /* GoogleMobileAds in Frameworks */,
 				D477DE522ED9AF9C00051CB9 /* SnapKit in Frameworks */,
 				D4A6BC262F17A65700E931A9 /* SPConfetti in Frameworks */,
 			);
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				D477DE512ED9AF9C00051CB9 /* SnapKit */,
 				D4A6BC252F17A65700E931A9 /* SPConfetti */,
+				D4A6BCE72F1A9BA800E931A9 /* GoogleMobileAds */,
 			);
 			productName = CurseCounter;
 			productReference = D477DCF62ED9A56200051CB9 /* CurseCounter.app */;
@@ -119,6 +122,7 @@
 			packageReferences = (
 				D477DE502ED9AF9C00051CB9 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				D4A6BC242F17A65700E931A9 /* XCRemoteSwiftPackageReference "SPConfetti" */,
+				D4A6BCE62F1A9BA800E931A9 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D477DCF72ED9A56200051CB9 /* Products */;
@@ -382,6 +386,14 @@
 				minimumVersion = 1.4.2;
 			};
 		};
+		D4A6BCE62F1A9BA800E931A9 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.14.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -394,6 +406,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D4A6BC242F17A65700E931A9 /* XCRemoteSwiftPackageReference "SPConfetti" */;
 			productName = SPConfetti;
+		};
+		D4A6BCE72F1A9BA800E931A9 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D4A6BCE62F1A9BA800E931A9 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

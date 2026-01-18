@@ -20,6 +20,8 @@ extension UserDefaults {
 		
 		case gameSurvivalBestScore = "gameSurvivalBestScore"
 		case gameSurvivalTutorial = "gameSurvivalTutorial"
+		
+		case shouldDisplayAds = "shouldDisplayAds"
 	}
 	
 	public static func set(_ value:Any?, _ key:UserDefaults.Keys) {

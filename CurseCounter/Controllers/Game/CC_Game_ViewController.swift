@@ -70,7 +70,7 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		super.loadView()
 		
-		let stackView: UIStackView = .init(arrangedSubviews: [zoneView])
+		let stackView: UIStackView = .init(arrangedSubviews: [zoneView,CC_Ads.shared.presentBanner(Ads.Banner.Game, self)])
 		stackView.axis = .vertical
 		stackView.spacing = UI.Margins
 		view.addSubview(stackView)
@@ -103,6 +103,19 @@ public class CC_Game_ViewController : CC_ViewController {
 			self?.resumeGame()
 		}
 		alertController.present()
+	}
+	
+	public override func dismiss(_ completion: (() -> Void)? = nil) {
+		
+		super.dismiss(completion)
+		
+		CC_Alert_ViewController.presentLoading { alertController in
+			
+			CC_Ads.shared.presentInterstitial(Ads.FullScreen.Game.End, nil, {
+				
+				alertController?.close(completion)
+			})
+		}
 	}
 	
 	internal func pauseGame() {
