@@ -66,7 +66,7 @@ public class CC_Menu_ViewController : CC_ViewController {
 		
 		let inAppButton:CC_Button = .init(String(key: "menu.button.inApp")) { _ in
 			
-//			CM_InAppPurchase.shared.promptInAppPurchaseAlert(withCapping: false)
+			CC_InAppPurchase.shared.promptInAppPurchaseAlert(withCapping: false)
 		}
 		inAppButton.type = .navigation
 		inAppButton.titleFont = Fonts.Content.Button.Title

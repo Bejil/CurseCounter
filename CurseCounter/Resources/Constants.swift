@@ -7,6 +7,13 @@
 
 import UIKit
 
+public struct InAppPurchase {
+	
+	static let AlertCapping:Int = 5
+	static let Identifiers:[String] = [RemoveAds]
+	static let RemoveAds:String = "com.michaelblin.CurseCounter.removeAds"
+}
+
 public struct UI {
 	
 	static var MainController :UIViewController {

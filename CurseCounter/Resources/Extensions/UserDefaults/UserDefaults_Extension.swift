@@ -22,6 +22,8 @@ extension UserDefaults {
 		case gameSurvivalTutorial = "gameSurvivalTutorial"
 		
 		case shouldDisplayAds = "shouldDisplayAds"
+			
+		case inAppPurchaseAlertCapping = "inAppPurchaseAlertCapping"
 	}
 	
 	public static func set(_ value:Any?, _ key:UserDefaults.Keys) {

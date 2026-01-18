@@ -71,3 +71,14 @@
 "settings.button.vibrations" = "Vibrations";
 "settings.button.vibrations.on" = "Activées";
 "settings.button.vibrations.off" = "Désactivées";
+
+//MARK: - InAppPurchase
+"inAppPurchase.purchase.alert.buy.button" = "Premium";
+"inAppPurchase.purchase.success.alert.title" = "Félicitations !";
+"inAppPurchase.purchase.success.alert.content" = "Vous ne serez plus ennuyé par les pubs !";
+"inAppPurchase.purchase.error.alert.content" = "L'achat a échoué ou a été annulé";
+"inAppPurchase.purchase.alert.restore.button.title" = "Restaurer";
+"inAppPurchase.purchase.alert.restore.button.subtitle" = "un précédent achat";
+"inAppPurchase.restore.success.alert.title" = "Félicitations !";
+"inAppPurchase.restore.success.alert.content" = "Votre achat a bien été restauré";
+"inAppPurchase.restore.error.content" = "Aucun achat restauré";
