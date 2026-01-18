@@ -35,6 +35,8 @@
 "game.over.bestScore.alert.title" = "Nouveau record !";
 "game.hit.combo" = "Combo";
 "game.hit.wrong" = "Raté";
+"game.hit.trap" = "Piège !";
+"game.hit.trap.avoided" = "Esquivé !";
 "game.hit.3" = "+3";
 "game.hit.2" = "+2";
 "game.hit.1" = "+1";
@@ -49,7 +51,10 @@
 "game.classic.tutorial.main.button" = "Suivant...";
 "game.classic.tutorial.combo.title" = "Combo";
 "game.classic.tutorial.combo.subtitle" = "Enchaînez les parfaits pour déclencher un combo !\n\nAprès %i parfaits consécutifs, chaque nouveau parfait vous rapporte un point bonus 🔥";
-"game.classic.tutorial.combo.button" = "C'est parti !";
+"game.classic.tutorial.combo.button" = "Suivant...";
+"game.classic.tutorial.trap.title" = "Pièges";
+"game.classic.tutorial.trap.subtitle" = "Attention aux zones rouges ! 🚫\n\nCe sont des pièges : ne les touchez pas !\nLaissez-les disparaître pour continuer.";
+"game.classic.tutorial.trap.button" = "C'est parti !";
 
 //MARK: - Game Survival
 "game.survival.tutorial.main.title" = "Mode survie";
@@ -57,7 +62,10 @@
 "game.survival.tutorial.main.button" = "Suivant...";
 "game.survival.tutorial.combo.title" = "Combo";
 "game.survival.tutorial.combo.subtitle" = "Enchaînez les parfaits pour déclencher un combo !\n\nAprès %i parfaits consécutifs, chaque nouveau parfait vous rapporte un point bonus 🔥";
-"game.survival.tutorial.combo.button" = "C'est parti !";
+"game.survival.tutorial.combo.button" = "Suivant...";
+"game.survival.tutorial.trap.title" = "Pièges";
+"game.survival.tutorial.trap.subtitle" = "Attention aux zones rouges ! 🚫\n\nCe sont des pièges : ne les touchez pas !\nToucher un piège vous fait perdre 5 secondes.";
+"game.survival.tutorial.trap.button" = "C'est parti !";
 
 //MARK: - Settings
 "settings.button" = "Réglages";

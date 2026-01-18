@@ -30,6 +30,11 @@ public class CC_Game_Classic_ViewController : CC_Game_ViewController {
 				title: String(key: "game.classic.tutorial.combo.title"),
 				subtitle: String(format: String(key: "game.classic.tutorial.combo.subtitle"), comboStreakRequired),
 				button: String(key: "game.classic.tutorial.combo.button")
+			),
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.classic.tutorial.trap.title"),
+				subtitle: String(key: "game.classic.tutorial.trap.subtitle"),
+				button: String(key: "game.classic.tutorial.trap.button")
 			)
 		]
 		tutorialViewController.completion = { [weak self] in

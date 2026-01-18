@@ -61,6 +61,11 @@ public class CC_Game_Survival_ViewController : CC_Game_ViewController {
 				title: String(key: "game.survival.tutorial.combo.title"),
 				subtitle: String(format: String(key: "game.survival.tutorial.combo.subtitle"), comboStreakRequired),
 				button: String(key: "game.survival.tutorial.combo.button")
+			),
+			CC_Tutorial_ViewController.Item(
+				title: String(key: "game.survival.tutorial.trap.title"),
+				subtitle: String(key: "game.survival.tutorial.trap.subtitle"),
+				button: String(key: "game.survival.tutorial.trap.button")
 			)
 		]
 		tutorialViewController.completion = { [weak self] in

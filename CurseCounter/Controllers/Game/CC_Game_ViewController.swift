@@ -66,6 +66,21 @@ public class CC_Game_ViewController : CC_ViewController {
 	private var colorTimer: Timer?
 	private var pausedTime: CFTimeInterval = 0
 	
+	// MARK: - Zones pièges
+	private let baseTrapChance: Double = 0.20 // 20% de base
+	private let minTrapChance: Double = 0.05 // 5% minimum
+	private let trapReductionPerHit: Double = 0.005 // Réduction par hit
+	private let minZonesBetweenTraps: Int = 3 // Au moins 3 zones normales entre chaque piège
+	private var zonesSinceLastTrap: Int = 0
+	
+	private var trapChance: Double {
+		return max(minTrapChance, baseTrapChance - (Double(hitsCount) * trapReductionPerHit))
+	}
+	
+	private var canSpawnTrap: Bool {
+		return zonesSinceLastTrap >= minZonesBetweenTraps
+	}
+	
 	public override func loadView() {
 		
 		super.loadView()
@@ -251,6 +266,20 @@ public class CC_Game_ViewController : CC_ViewController {
 		
 		// Retirer les anciens gesture recognizers
 		zoneView.gestureRecognizers?.forEach { zoneView.removeGestureRecognizer($0) }
+		
+		// Déterminer si c'est une zone piège
+		let isTrapZone = canSpawnTrap && Double.random(in: 0...1) < trapChance
+		
+		if isTrapZone {
+			zonesSinceLastTrap = 0
+			createTrapZone()
+		} else {
+			zonesSinceLastTrap += 1
+			createNormalZone()
+		}
+	}
+	
+	private func createNormalZone() {
 		
 		let targetSize: CGFloat = 3.5 * UI.Margins
 		let initialSize: CGFloat = targetSize * 15.0
@@ -456,9 +485,9 @@ public class CC_Game_ViewController : CC_ViewController {
 				if self?.missEndsGame == true {
 					self?.gameOver()
 				} else {
-				UIApplication.wait { [weak self] in
+					UIApplication.wait { [weak self] in
 						guard self?.isGameStopped != true else { return }
-					self?.createZone()
+						self?.createZone()
 					}
 				}
 			}
@@ -548,6 +577,264 @@ public class CC_Game_ViewController : CC_ViewController {
 					}
 				}
 			}
+		})
+	}
+	
+	private func createTrapZone() {
+		
+		let targetSize: CGFloat = 3.5 * UI.Margins
+		let initialSize: CGFloat = targetSize * 15.0
+		
+		// Durée similaire aux zones normales
+		let baseDuration: TimeInterval = 2.0
+		let speedIncrement: TimeInterval = 0.015
+		let animationDuration = max(0.1, baseDuration - (Double(hitsCount) * speedIncrement))
+		
+		// Container pour la zone QTE
+		let qteContainer = UIView()
+		zoneView.addSubview(qteContainer)
+		
+		// Position aléatoire
+		let margin = targetSize + UI.Margins
+		let minX = zoneView.safeAreaInsets.left + margin
+		let maxX = zoneView.frame.size.width - zoneView.safeAreaInsets.right - margin
+		let minY = zoneView.safeAreaInsets.top + margin
+		let maxY = zoneView.frame.size.height - zoneView.safeAreaInsets.bottom - margin
+		
+		let randomX = CGFloat.random(in: minX...maxX)
+		let randomY = CGFloat.random(in: minY...maxY)
+		
+		qteContainer.snp.makeConstraints { make in
+			make.centerX.equalTo(randomX)
+			make.centerY.equalTo(randomY)
+			make.size.equalTo(initialSize)
+		}
+		
+		// Cercle central (zone cible fixe) - ROUGE pour le piège
+		let targetCircle = UIView()
+		targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.15)
+		targetCircle.layer.borderColor = Colors.Hits.Wrong.withAlphaComponent(0.3).cgColor
+		targetCircle.layer.borderWidth = 3
+		targetCircle.layer.cornerRadius = targetSize / 2
+		qteContainer.addSubview(targetCircle)
+		
+		targetCircle.snp.makeConstraints { make in
+			make.center.equalToSuperview()
+			make.size.equalTo(targetSize)
+		}
+		
+		// Cercle extérieur (qui se rétrécit) - ROUGE
+		let shrinkingCircle = UIView()
+		shrinkingCircle.isUserInteractionEnabled = false
+		shrinkingCircle.backgroundColor = UIColor.clear
+		shrinkingCircle.layer.borderColor = Colors.Hits.Wrong.cgColor
+		shrinkingCircle.layer.borderWidth = 3
+		shrinkingCircle.layer.cornerRadius = initialSize / 2
+		qteContainer.addSubview(shrinkingCircle)
+		
+		shrinkingCircle.snp.makeConstraints { make in
+			make.center.equalToSuperview()
+			make.size.equalTo(initialSize)
+		}
+		
+		var hasBeenTapped = false
+		
+		// Tap sur le piège = erreur (comme un miss)
+		let tapGesture = UITapGestureRecognizer(block: { [weak self] _ in
+			
+			guard !hasBeenTapped else { return }
+			hasBeenTapped = true
+			
+			// Hook pour les sous-classes
+			self?.onTrapHit()
+			
+			CC_Audio.shared.playSound(.Error)
+			CC_Feedback.shared.make(.Error)
+			
+			// Afficher le feedback d'erreur
+			self?.showTrapFeedback(in: qteContainer)
+			
+			UIView.animation {
+				
+				targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.6)
+			}
+			
+			targetCircle.pulse(Colors.Hits.Wrong) {
+				
+				qteContainer.removeFromSuperview()
+			}
+			
+			if self?.missEndsGame == true {
+				self?.gameOver()
+			} else {
+				UIApplication.wait { [weak self] in
+					guard self?.isGameStopped != true else { return }
+					self?.createZone()
+				}
+			}
+		})
+		targetCircle.addGestureRecognizer(tapGesture)
+		
+		// Tap en dehors de la zone piège = aussi une erreur
+		let missedTapGesture = UITapGestureRecognizer(block: { [weak self] _ in
+			
+			guard !hasBeenTapped else { return }
+			hasBeenTapped = true
+			
+			// Hook pour les sous-classes
+			self?.onMiss()
+			
+			CC_Audio.shared.playSound(.Error)
+			CC_Feedback.shared.make(.Error)
+			
+			// Afficher le feedback d'erreur
+			self?.showMissFeedback(in: qteContainer)
+			
+			UIView.animation {
+				
+				targetCircle.backgroundColor = Colors.Hits.Wrong.withAlphaComponent(0.4)
+			}
+			
+			targetCircle.pulse(Colors.Hits.Wrong) {
+				
+				qteContainer.removeFromSuperview()
+			}
+			
+			if self?.missEndsGame == true {
+				self?.gameOver()
+			} else {
+				UIApplication.wait { [weak self] in
+					guard self?.isGameStopped != true else { return }
+					self?.createZone()
+				}
+			}
+		})
+		missedTapGesture.require(toFail: tapGesture)
+		zoneView.addGestureRecognizer(missedTapGesture)
+		
+		UIView.animation(animationDuration, {
+			
+			shrinkingCircle.transform = CGAffineTransform(scaleX: targetSize / initialSize, y: targetSize / initialSize)
+			
+		}, { [weak self] in
+			
+			guard self?.isGameStopped != true else { return }
+			
+			// Si le piège n'a pas été touché = succès !
+			if !hasBeenTapped {
+				
+				hasBeenTapped = true
+				
+				CC_Audio.shared.playSound(.Success)
+				CC_Feedback.shared.make(.Success)
+				
+				// Afficher le feedback de succès
+				self?.showTrapAvoidedFeedback(in: qteContainer)
+				
+				UIView.animation(0.3, {
+					
+					qteContainer.alpha = 0
+					
+				}, {
+					
+					qteContainer.removeFromSuperview()
+				})
+				
+				UIApplication.wait { [weak self] in
+					guard self?.isGameStopped != true else { return }
+					self?.createZone()
+				}
+			}
+		})
+	}
+	
+	internal func onTrapHit() {
+		
+		// Par défaut, même comportement qu'un miss
+		onMiss()
+	}
+	
+	internal func showTrapFeedback(in container: UIView) {
+		
+		let feedbackLabel = CC_Label(String(key: "game.hit.trap"))
+		feedbackLabel.font = Fonts.Content.Title.H2
+		feedbackLabel.textColor = Colors.Hits.Wrong
+		feedbackLabel.textAlignment = .center
+		feedbackLabel.alpha = 0
+		feedbackLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+		zoneView.addSubview(feedbackLabel)
+		
+		let containerCenter = container.center
+		feedbackLabel.snp.makeConstraints { make in
+			make.centerX.equalTo(containerCenter.x)
+			make.centerY.equalTo(containerCenter.y)
+		}
+		
+		UIView.animation(0.15, {
+			
+			feedbackLabel.alpha = 1
+			feedbackLabel.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+			
+		}, {
+			
+			UIView.animation(0.1, {
+				
+				feedbackLabel.transform = .identity
+				
+			}, {
+				
+				UIView.animation(0.4, {
+					
+					feedbackLabel.alpha = 0
+					feedbackLabel.transform = CGAffineTransform(translationX: 0, y: -50)
+					
+				}, {
+					
+					feedbackLabel.removeFromSuperview()
+				})
+			})
+		})
+	}
+	
+	internal func showTrapAvoidedFeedback(in container: UIView) {
+		
+		let feedbackLabel = CC_Label(String(key: "game.hit.trap.avoided"))
+		feedbackLabel.font = Fonts.Content.Title.H2
+		feedbackLabel.textColor = Colors.Hits.Perfect
+		feedbackLabel.textAlignment = .center
+		feedbackLabel.alpha = 0
+		feedbackLabel.transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
+		zoneView.addSubview(feedbackLabel)
+		
+		let containerCenter = container.center
+		feedbackLabel.snp.makeConstraints { make in
+			make.centerX.equalTo(containerCenter.x)
+			make.centerY.equalTo(containerCenter.y)
+		}
+		
+		UIView.animation(0.15, {
+			
+			feedbackLabel.alpha = 1
+			feedbackLabel.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+			
+		}, {
+			
+			UIView.animation(0.1, {
+				
+				feedbackLabel.transform = .identity
+				
+			}, {
+				
+				UIView.animation(0.4, {
+					
+					feedbackLabel.alpha = 0
+					feedbackLabel.transform = CGAffineTransform(translationX: 0, y: -50)
+					
+				}, {
+					
+					feedbackLabel.removeFromSuperview()
+				})
+			})
 		})
 	}
 	
