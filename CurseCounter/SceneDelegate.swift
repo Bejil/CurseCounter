@@ -18,9 +18,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		window = UIWindow(windowScene: windowScene)
 		window?.backgroundColor = Colors.Background.Application
 		
-		let navigationController: CC_NavigationController = .init(rootViewController: CC_Menu_ViewController())
-		navigationController.navigationBar.prefersLargeTitles = false
-		window?.rootViewController = navigationController
+		let viewController:CC_Splashscreen_ViewController = .init()
+		viewController.completion = { [weak self] in
+			
+			let navigationController: CC_NavigationController = .init(rootViewController: CC_Menu_ViewController())
+			navigationController.navigationBar.prefersLargeTitles = false
+			self?.window?.rootViewController = navigationController
+		}
+		window?.rootViewController = viewController
 		
 		window?.makeKeyAndVisible()
 	}
