@@ -1,7 +1,16 @@
 {
   "colors" : [
     {
-      "idiom" : "universal"
+      "color" : {
+        "color-space" : "srgb",
+        "components" : {
+          "alpha" : "1.000",
+          "blue" : "0x00",
+          "green" : "0x93",
+          "red" : "0xFF"
+        }
+      },
+      "idiom" : "iphone"
     }
   ],
   "info" : {
