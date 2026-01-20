@@ -70,6 +70,12 @@ public class CC_Menu_ViewController : CC_ViewController {
 		}
 		inAppButton.type = .navigation
 		inAppButton.titleFont = Fonts.Content.Button.Title
+		inAppButton.isHidden = !CC_Ads.shared.shouldDisplayAd
+		
+		NotificationCenter.add(.updateAds) { _ in
+			
+			inAppButton.isHidden = !CC_Ads.shared.shouldDisplayAd
+		}
 		
 		let stackView:UIStackView = .init(arrangedSubviews: [titleImageView,titleLabel,subtitleLabel,classicGameButton,survivalGameButton,inAppButton])
 		stackView.axis = .vertical
